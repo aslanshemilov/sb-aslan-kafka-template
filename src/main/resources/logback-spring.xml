@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true" scan="true" scanPeriod="30 seconds">
+    <contextName>sb-aslan-kafka-template</contextName>
+    <property resource="application.yml" />
+    <!-- <property resource="LOG_DIR" value="${user.dir}/applogs" /> -->
+    <property name="APP_CODE" value="RRRR" />
+    <!-- FOR LOCAL ENVIRONMENT -->
+    <springProfile name="local">
+        <!-- configuration to be enabled when the "local" profile is active -->
+        <property name="LOG_DIR" value="applogs" />
+        <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${LOG_DIR}/MyLogName.log</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <!-- daily rollover -->
+                <fileNamePattern>${LOG_DIR}/MyLogName-%d{yyyy-MM-dd}-v%i.log</fileNamePattern>
+                <!-- total size of all archive files, if total size > 20GB, it will delete old archived file -->
+                <totalSizeCap>1GB</totalSizeCap>
+                <!-- 60 days to keep -->
+                <maxHistory>2</maxHistory>
+                <!-- rollover on startup, daily and when the file reaches 10 MegaBytes -->
+                <!-- each archived file, size max 10MB -->
+                <maxFileSize>10MB</maxFileSize>
+            </rollingPolicy>
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                <FieldNames>
+                    <timestamp>timestamp</timestamp>
+                    <version>[ignore]</version>
+                    <logger>class</logger>
+                    <thread>thread</thread>
+                    <levelValue>[ignore]</levelValue>
+                    <stackTrace>exception</stackTrace>
+                    <message>appMessage</message>
+                </FieldNames>
+                <timeZone>UTC</timeZone>
+                <customFields>{"appName": "${CONTEXT_NAME}","appCode":"${APP_CODE}"}</customFields>
+            </encoder>
+        </appender>
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <Pattern>
+                    [%d{yyyy-MM-dd HH:mm:ss.SSS}][%thread][%-5level][%logger{36}] - %green(%msg%n)
+                </Pattern>
+            </encoder>
+        </appender>
+        <root level="INFO">
+            <appender-ref ref="FILE"/>
+            <appender-ref ref="CONSOLE"/>
+        </root>
+        <logger name="org.hibernate">
+            <level value="INFO" />
+        </logger>
+        <logger name="org.springframework">
+            <level value="INFO" />
+        </logger>
+    </springProfile>
+    <!-- FOR DEV, QAT and UAT ENVIRONMENTS -->
+    <springProfile name="dev | qat | uat">
+        <!-- configuration to be enabled when the "dev" or "qat" or "uat" profiles is active -->
+        <property name="LOG_DIR" value="applogs" />
+        <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${LOG_DIR}/MyLogName.log</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <!-- daily rollover -->
+                <fileNamePattern>${LOG_DIR}/MyLogName-%d{yyyy-MM-dd}-v%i.log</fileNamePattern>
+                <!-- total size of all archive files, if total size > 20GB, it will delete old archived file -->
+                <totalSizeCap>1GB</totalSizeCap>
+                <!-- 60 days to keep -->
+                <maxHistory>2</maxHistory>
+                <!-- rollover on startup, daily and when the file reaches 10 MegaBytes -->
+                <!-- each archived file, size max 10MB -->
+                <maxFileSize>10MB</maxFileSize>
+            </rollingPolicy>
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                <FieldNames>
+                    <timestamp>timestamp</timestamp>
+                    <version>[ignore]</version>
+                    <logger>class</logger>
+                    <thread>thread</thread>
+                    <levelValue>[ignore]</levelValue>
+                    <stackTrace>exception</stackTrace>
+                    <message>appMessage</message>
+                </FieldNames>
+                <timeZone>UTC</timeZone>
+                <customFields>{"appName": "${CONTEXT_NAME}","appCode":"${APP_CODE}"}</customFields>
+            </encoder>
+        </appender>
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <Pattern>
+                    [%d{yyyy-MM-dd HH:mm:ss.SSS}][%thread][%-5level][%logger{36}] - %green(%msg%n)
+                </Pattern>
+            </encoder>
+        </appender>
+        <root level="INFO">
+            <appender-ref ref="FILE"/>
+            <appender-ref ref="CONSOLE"/>
+        </root>
+        <logger name="org.hibernate">
+            <level value="INFO" />
+        </logger>
+        <logger name="org.springframework">
+            <level value="INFO" />
+        </logger>
+    </springProfile>
+    <springProfile name="prod">
+        <!-- configuration to be enabled when the "prod" profile is active -->
+        <property name="LOG_DIR" value="applogs" />
+        <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${LOG_DIR}/MyLogName.log</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <!-- daily rollover -->
+                <fileNamePattern>${LOG_DIR}/MyLogName-%d{yyyy-MM-dd}-v%i.log</fileNamePattern>
+                <!-- total size of all archive files, if total size > 20GB, it will delete old archived file -->
+                <totalSizeCap>1GB</totalSizeCap>
+                <!-- 60 days to keep -->
+                <maxHistory>2</maxHistory>
+                <!-- rollover on startup, daily and when the file reaches 10 MegaBytes -->
+                <!-- each archived file, size max 10MB -->
+                <maxFileSize>10MB</maxFileSize>
+            </rollingPolicy>
+            <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+                <FieldNames>
+                    <timestamp>timestamp</timestamp>
+                    <version>[ignore]</version>
+                    <logger>class</logger>
+                    <thread>thread</thread>
+                    <levelValue>[ignore]</levelValue>
+                    <stackTrace>exception</stackTrace>
+                    <message>appMessage</message>
+                </FieldNames>
+                <timeZone>UTC</timeZone>
+                <customFields>{"appName": "${CONTEXT_NAME}","appCode":"${APP_CODE}"}</customFields>
+            </encoder>
+        </appender>
+        <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <Pattern>
+                    [%d{yyyy-MM-dd HH:mm:ss.SSS}][%thread][%-5level][%logger{36}] - %green(%msg%n)
+                </Pattern>
+            </encoder>
+        </appender>
+        <root level="INFO">
+            <appender-ref ref="FILE"/>
+            <appender-ref ref="CONSOLE"/>
+        </root>
+        <logger name="org.hibernate">
+            <level value="INFO" />
+        </logger>
+        <logger name="org.springframework">
+            <level value="INFO" />
+        </logger>
+    </springProfile>
+</configuration>
