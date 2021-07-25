@@ -1,5 +1,6 @@
 package com.aslan.kafka.controller;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,12 +20,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.aslan.kafka.model.DataModel;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api")
@@ -33,6 +38,22 @@ public class ApiController {
     private Logger logger = LoggerFactory.getLogger(ApiController.class.getName());
     private ObjectMapper objMapper;
     private Gson gson;
+    private static final int DELAY_PER_ITEM_MS = 100;
+   
+    // "A Letter to my Nephew"
+    private String[] speech = {
+            "Well,","you","were","born;","here","you","came,","something","like","fifteen","years","ago,","and","though",
+            "your","father","and","mother","and","grandmother,","looking","about","the","streets","through","which","they",
+            "were","carrying","you,","staring","at","the","walls","into","which","they","brought","you,","had","every",
+            "reason","to","be","heavy-hearted,","yet","they","were","not,","for","here","you","were,","big","James,",
+            "named","for","me.","You","were","a","big","baby.","I","was","not.","Here","you","were","to","be","loved.",
+            "To","be","loved,","baby,","hard","at","once","and","forever","to","strengthen","you","against","the",
+            "loveless","world.","Remember","that.","I","know","how","black","it","looks","today","for","you.","It","looked",
+            "black","that","day","too.","Yes,","we","were","trembling.","We","have","not","stopped","trembling","yet,",
+            "but","if","we","had","not","loved","each","other,","none","of","us","would","have","survived,","and","now",
+            "you","must","survive","because","we","love","you","and","for","the","sake","of","your","children","and",
+            "your","children's","children.",
+    };
 
     @Value("${spring.application.name}")
     private String appname;
@@ -59,17 +80,36 @@ public class ApiController {
         return "health";
     }
 
+    @RequestMapping(path = {"/mono"}, method = RequestMethod.GET, produces = {MediaType.TEXT_HTML_VALUE, "application/json; charset=utf-8"})
+    public Mono<String> getMono() {
+    	Mono<String> str = Mono.just("Welcome to Web Mono");
+        return str;
+    }
+    
+    @RequestMapping(path = {"/flux"}, method = RequestMethod.GET, produces = {MediaType.APPLICATION_JSON_VALUE, "application/json; charset=utf-8"})
+    public Flux<String> getFlux() {
+    	//Flux<String> str = Flux.just("Welcome ", "to ", "Web Flux").delayElements(Duration.ofMillis(DELAY_PER_ITEM_MS));
+    	Flux<String> str = Flux.just("Welcome ", "to ", "Web Flux").delayElements(Duration.ofSeconds(1)).log();
+        return str;
+    }
+    
+    @GetMapping(value="/speech", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<String> getSpeech() {
+        return Flux
+                .fromArray(speech)
+                .delayElements(Duration.ofSeconds(1))
+                .repeat()
+                .log();
+    }
+    
     @RequestMapping(path = {"/start", "/starting"},
             method = {RequestMethod.GET},
             produces = {MediaType.APPLICATION_JSON_VALUE, "application/json; charset=utf-8"},
             consumes = {MediaType.ALL_VALUE})
     @ResponseBody
-    public ResponseEntity<?> start() {
-        Map<String, String> map = new HashMap<String, String>();
+    @ResponseStatus(HttpStatus.OK)
+    public void start() {
         logger.info("ApiController::start(): {}", "Start");
-
-
-        return new ResponseEntity<>(map, HttpStatus.OK);
     }
     
     @RequestMapping(path = {"producer"},

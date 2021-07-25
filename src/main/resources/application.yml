@@ -3,6 +3,11 @@
 spring:
   application:
     name: sb-aslan-kafka-template
+  mustache:
+    prefix: classpath:/mustache
+    suffix: .html
+    expose-request-attributes: true
+    expose-spring-macro-helpers: true
   profiles:
     active:
       - local
