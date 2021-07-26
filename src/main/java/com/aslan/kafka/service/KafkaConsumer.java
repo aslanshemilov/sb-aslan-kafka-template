@@ -33,7 +33,7 @@ public class KafkaConsumer {
 	 * If we don't need to set the offset, we can use the partitions property of @TopicPartition annotation to set only the partitions without the offset:
 	 */
     /*
-	//@KafkaListener(topics = "customer-topic-2", groupId = "group_id", containerFactory = "kafkaListenerContainerFactory")
+	@KafkaListener(topics = "customer-topic-2", groupId = "group_id", containerFactory = "kafkaListenerContainerFactory")
     @KafkaListener(
 			topicPartitions = @TopicPartition(topic = "customer-topic-1", 
 			//partitions = { "0", "1", "2", "3" }, // either this
@@ -43,8 +43,9 @@ public class KafkaConsumer {
 			}),
 			groupId = "group_json", containerFactory = "userKafkaListenerFactory")
 	*/
+    //@KafkaListener(topics = "customer-topic-1", groupId = "group_id", containerFactory = "kafkaListenerContainerFactory")
     public void consume(String message) {
-		logger.info("KafkaConsumer::consume(customer-topic-2): Consumed message: " + message);
+		logger.info("KafkaConsumer::consume(customer-topic-1): Consumed message: " + message);
     } 
 
 } //end class

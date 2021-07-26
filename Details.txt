@@ -59,3 +59,6 @@ ListenableFuture<SendResult<K, V>> send(ProducerRecord<K, V> record);
  * @see org.springframework.kafka.support.KafkaHeaders#MESSAGE_KEY
  */
 ListenableFuture<SendResult<K, V>> send(Message<?> message);
+
+
+mvn generate-sources

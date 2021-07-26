@@ -35,6 +35,11 @@
         <!-- <junit-jupiter.version>5.5.0</junit-jupiter.version> -->
         
         <junit.version>4.12</junit.version>
+        <avro.version>1.9.2</avro.version>
+        <confluent.version>5.0.0</confluent.version>
+        <!-- 
+        <kafka.version>2.3.0</kafka.version>
+         -->
 	</properties>
 	
 	<dependencies>
@@ -194,6 +199,15 @@
 	      <artifactId>reactor-test</artifactId>
 	      <scope>test</scope>
 	    </dependency>
+	    <!-- 
+	    <dependency>
+	      <groupId>org.synchronoss.cloud</groupId>
+	      <artifactId>nio-multipart-parser</artifactId>
+	      <version>1.1.0</version>
+	      <scope>compile</scope>
+	    </dependency>
+	     -->
+	    
 		<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
         <!--
         <dependency>
@@ -202,6 +216,12 @@
             <version>1.7.25</version>
         </dependency>
         -->
+         <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+        
 		<!-- https://mvnrepository.com/artifact/org.springframework.kafka/spring-kafka -->
         <!--Spring Kafka Support. requires org.springframework.kafka.core.KafkaTemplate-->
         <dependency>
@@ -221,13 +241,47 @@
             <version>0.10.0.1</version>
         </dependency>
          -->
-
+         <dependency>
+            <groupId>io.confluent</groupId>         
+			<artifactId>kafka-schema-registry-client</artifactId>
+            <version>5.3.0</version>
+        </dependency>
+		<dependency>
+            <groupId>org.apache.avro</groupId>
+            <artifactId>avro</artifactId>
+            <version>${avro.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.confluent</groupId>
+            <artifactId>kafka-avro-serializer</artifactId>
+            <version>5.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.confluent</groupId>
+            <artifactId>kafka-streams-avro-serde</artifactId>
+            <version>5.3.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 		
 	</dependencies>
+	
+	<repositories>
+        <!-- other maven repositories the project -->
+        <repository>
+            <id>confluent</id>  
+            <url>https://packages.confluent.io/maven/</url>
+        </repository>
+    </repositories>
 
 	<build>
 		<defaultGoal>clean package</defaultGoal>
 		<plugins>
+			<!-- main maven plugins in the project -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
@@ -246,7 +300,6 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
-            
             <plugin>
                 <!-- https://mvnrepository.com/artifact/org.jacoco/jacoco-maven-plugin -->
                 <groupId>org.jacoco</groupId>
@@ -271,6 +324,59 @@
                     </execution>
                 </executions>
             </plugin>
+            
+            <!--for specific record-->
+            <plugin>
+	            <groupId>org.apache.avro</groupId>
+	            <artifactId>avro-maven-plugin</artifactId>
+	            <version>1.8.2</version>
+	            <executions>
+	                <execution>
+	                    <phase>generate-sources</phase>
+	                    <goals>
+                            <goal>schema</goal>
+                            <goal>protocol</goal>
+                            <goal>idl-protocol</goal>
+                        </goals>
+	                    <configuration>
+		                    <sourceDirectory>${project.basedir}/src/main/resources/avro</sourceDirectory>
+							<!--<outputDirectory>${project.build.directory}/generated-sources/avro</outputDirectory>-->
+							<!--<outputDirectory>${project.basedir}/src/main/java/avro</outputDirectory>-->
+							<!-- 
+							<imports>
+			                    <import>${project.basedir}/src/main/resources/avro/customer.avsc</import>
+			                </imports>
+			                 -->
+		                    <stringType>String</stringType>
+		                    <createSetters>false</createSetters>
+                            <enableDecimalLogicalType>true</enableDecimalLogicalType>
+                            <fieldVisibility>private</fieldVisibility>
+	                    </configuration>
+	                </execution>
+	            </executions>
+	        </plugin>
+	        
+	        <!--force discovery of generated classes-->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>target/generated-sources/avro</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            
 		</plugins>
 	</build>
 	
